@@ -3,6 +3,7 @@
 let urImage = // image
 
 let pixelator = Pixelator();
+
 pixelator.set(image: urImage);
 
 let pixelatedImage = pixelator.pixelate(downRate: 8)
