@@ -16,7 +16,7 @@
 //    return nil;
 //}
 
-- (instancetype)initWithImage:(UIImage *)image {
+- (instancetype)initWithImage:(CrossImage *)image {
     self = [super init];
     
     if (self) {
@@ -29,8 +29,10 @@
         
         if (image != nil) {
             
+            CGImageRef temp_cgImageRef = NULL;
+#if TARGET_OS_IPHONE
             // get the reference to CGImageRef
-            CGImageRef temp_cgImageRef = [image CGImage];
+            temp_cgImageRef = [image CGImage];
             
             // if the UIImage instance is backed by CIImage
             if (!temp_cgImageRef) {
@@ -38,6 +40,18 @@
                 // get CGImageRef from CIImage instance
                 temp_cgImageRef = [[image CIImage] CGImage];
             }
+#elif TARGET_OS_MAC
+            CGImageSourceRef cgimageSource = CGImageSourceCreateWithData((CFDataRef)[image TIFFRepresentation], NULL);
+            
+            
+            // get the reference to CGImageRef
+            temp_cgImageRef = CGImageSourceCreateImageAtIndex(cgimageSource, 0, NULL);
+            
+//            temp_cgImageRef = [image CGImageForProposedRect:<#(nullable NSRect *)#> context:<#(nullable NSGraphicsContext *)#> hints:<#(nullable NSDictionary<NSString *,id> *)#>];
+            CFRelease(cgimageSource);
+            cgimageSource = NULL;
+#endif
+            
             
             
             // if the CGImageRef exists
@@ -87,6 +101,11 @@
                 
                 CGContextRelease(cgContext);
                 cgContext = NULL;
+                
+#if TARGET_OS_MAC
+                CGImageRelease(temp_cgImageRef);
+#endif
+                
             }
             
         }
@@ -353,12 +372,12 @@
 
 
 #pragma mark setters and getters
-- (UIImage *) getImage {
+- (CrossImage *) getImage {
     
-    UIImage * img;
+    CrossImage * img;
     
     if ([self isEmptyImage]) {
-        img = [[UIImage alloc] init];
+        img = [[CrossImage alloc] init];
     } else {
         
         CFDataRef cfdata = CFDataCreate(NULL, self->raw, width * height * bytesPerPixel);
@@ -382,7 +401,12 @@
         
         printf("width: %zu, height: %zu \n", CGImageGetWidth(cgimage), CGImageGetHeight(cgimage));
         
-        img = [[UIImage alloc] initWithCGImage: cgimage];
+#if TARGET_OS_IPHONE
+        img = [[CrossImage alloc] initWithCGImage: cgimage];
+#elif TARGET_OS_MAC
+        img = [[CrossImage alloc] initWithCGImage: cgimage size:(NSSize){self->width, self->height}];
+#endif
+        
         
         
         CFRelease(cfdata);
