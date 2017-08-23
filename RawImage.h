@@ -7,8 +7,21 @@
 //
 
 @import Foundation;
+
+#if TARGET_OS_IPHONE
 @import UIKit;
+#elif TARGET_OS_MAC
+@import AppKit;
+#endif
+
 @import CoreGraphics;
+
+
+#if TARGET_OS_IPHONE
+#define CrossImage UIImage
+#elif TARGET_OS_MAC
+#define CrossImage NSImage
+#endif
 
 
 /*!
@@ -30,7 +43,7 @@
 
 
 NS_ASSUME_NONNULL_BEGIN
-@property(nonatomic, getter=getImage) UIImage * image;
+@property(nonatomic, getter=getImage) CrossImage * image;
 @property(nonatomic, getter=getWidth) NSInteger width;
 @property(nonatomic, getter=getHeight) NSInteger height;
 NS_ASSUME_NONNULL_END
@@ -41,7 +54,7 @@ NS_ASSUME_NONNULL_END
 
 
 NS_ASSUME_NONNULL_BEGIN
-- (instancetype) initWithImage: (nullable UIImage *) image;
+- (instancetype) initWithImage: (nullable CrossImage *) image;
 NS_ASSUME_NONNULL_END
 
 - (void)dealloc;
@@ -81,7 +94,7 @@ NS_ASSUME_NONNULL_END
 
 
 NS_ASSUME_NONNULL_BEGIN
-- (nonnull UIImage * ) getImage;
+- (nonnull CrossImage * ) getImage;
 
 /// Width of the raw image.
 /// @return Width of underlying Core Graphics image in Integer format
