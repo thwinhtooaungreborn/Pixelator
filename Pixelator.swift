@@ -6,7 +6,17 @@
 //  Copyright © 2017 Thwin Htoo Aung. All rights reserved.
 //
 
-import UIKit
+
+
+
+#if TARGET_OS_IPHONE
+    import UIKit;
+    typealias CrossImage = UIImage;
+#else
+    import AppKit
+    typealias CrossImage = NSImage;
+#endif
+
 
 class Pixelator: NSObject {
     
@@ -26,7 +36,7 @@ class Pixelator: NSObject {
     ///
     /// - Parameter image: image instance to convert to pixelated image later
     ///
-    func set(image: UIImage) {
+    func set(image: CrossImage) {
         original = PixMap.init(image: image)
         modified = nil
     }
@@ -39,7 +49,7 @@ class Pixelator: NSObject {
     ///
     /// - Returns: Pixelated UIImage instance
     ///
-    func pixelate(downRate: Int) -> UIImage! {
+    func pixelate(downRate: Int) -> CrossImage! {
         
         modified = original?.copy()
         
